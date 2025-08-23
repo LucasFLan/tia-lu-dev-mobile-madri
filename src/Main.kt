@@ -6,11 +6,30 @@ data class Produto (
     var codigo: Int
 )
 
+enum class OrderStatus{
+    ACEITO,
+    FAZENDO,
+    FEITO,
+    ESPERANDO_ENTREGADOR,
+    SAIU_PARA_ENTREGA,
+    ENTREGUE
+}
+
+data class Pedido (
+    var numeroPedido: Int,
+    var itens: MutableList<Produto>,
+    var pagamento: String,
+    var status: OrderStatus,
+    var valor: Float
+)
+
+
 fun main() {
 
 
     var isOnInterface: Boolean = true
     var itensMenu = mutableListOf<Produto>()
+    var pedidos = mutableListOf<Pedido>()
 
     do {
         println("1 - Cadastrar item")
