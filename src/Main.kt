@@ -234,6 +234,54 @@ fun main() {
                     }
                 } while (fazendoPedido)
             }
+            4 -> {
+                println("---ATUALIZAÇÃO DO STATUS DO PEDIDO---")
+
+                if(pedidos.isEmpty()) {
+                    println("Sem pedidos por aqui\n")
+                } else {
+                    println("Escolha o pedido para atualizar o status\n")
+                    println("PEDIDOS:")
+                    for (pedido in pedidos) {
+                        println("Número do pedido: ${pedido.numeroPedido} - ${pedido.status}\n - total: R$${pedido.valor}")
+                    }
+
+                    val codigoPedidoEscolhido: Int = readln().toInt()
+
+                    val pedidoEscolhido: Pedido? = pedidos.find {
+                        it.numeroPedido == codigoPedidoEscolhido
+                    }
+
+                    if (pedidoEscolhido == null) {
+                        println("Pedido não encontrado")
+                    } else {
+                        println("Deseja atualizar o pedido para qual Status? Status atual " +
+                                "do pedido ${pedidoEscolhido.numeroPedido}: ${pedidoEscolhido.status}\n")
+
+                        println("1 - FAZENDO")
+                        println("2 - FEITO")
+                        println("3 - ESPERANDO ENTREGADOR")
+                        println("4 - SAIU PARA ENTREGA")
+                        println("5 - ENTREGUE")
+
+                        val statusEscolhido: Int = readln().toInt()
+
+                        val numeroPedido = pedidoEscolhido.numeroPedido
+
+                        when(statusEscolhido) {
+                            1 -> pedidos[numeroPedido].status = OrderStatus.FAZENDO
+                            2 -> pedidos[numeroPedido].status = OrderStatus.FEITO
+                            3 -> pedidos[numeroPedido].status = OrderStatus.ESPERANDO_ENTREGADOR
+                            4 -> pedidos[numeroPedido].status = OrderStatus.SAIU_PARA_ENTREGA
+                            5 -> pedidos[numeroPedido].status = OrderStatus.ENTREGUE
+                        }
+
+                        println("Status do pedido ${pedidoEscolhido.numeroPedido} alterado para ${pedidoEscolhido.status} " +
+                                "com sucesso\n")
+                    }
+                }
+
+            }
             6 -> isOnInterface = false
             else -> println("Opção inválida")
 
