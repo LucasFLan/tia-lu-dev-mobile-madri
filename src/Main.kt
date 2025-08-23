@@ -100,9 +100,126 @@ fun main() {
                 }
 
             }
+            3 -> {
+                println("---CRIAÇÃO DE PEDIDO---")
 
+                var fazendoPedido = true
+                var escolhendoItens = true
+                var itensEscolhidos = mutableListOf<Produto>()
+                var quantidade: Int = 0
+
+
+                val numeroPedido = when {
+                    pedidos.isEmpty() -> 0
+                    else -> pedidos.lastIndex + 1
+                }
+
+                var novoPedido = Pedido(numeroPedido = numeroPedido, itens = itensEscolhidos, pagamento = "Em análise",
+                    valor = 0f, status = OrderStatus.ACEITO)
+
+                do {
+                    println("1 - Adicionar itens ao pedido")
+                    println("2 - Finalizar pedido")
+                    println("3 - Limpar carrinho")
+                    println("4 - Voltar")
+
+                    val opcaoEscolhida: Int = readln().toInt()
+
+                    when (opcaoEscolhida) {
+                        1 -> {
+                            do {
+                                if(itensMenu.isEmpty()) {
+                                    println("Nenhum item cadastrado\n")
+                                    break
+                                }
+
+                                println("Qual item deseja adicionar ao pedido?\n")
+                                for (item in itensMenu) {
+                                    println("${item.codigo} - ${item.nome} | Descrição: ${item.descricao} | " +
+                                            "Preço: R$${item.preco} | Quantidade disponível: ${item.estoque}")
+                                }
+
+                                val codigoItemEscolhido: Int = readln().toInt()
+
+                                val produtoEscolhido: Produto? = itensMenu.find {it.codigo == codigoItemEscolhido}
+
+                                if(produtoEscolhido == null){
+                                    println("Produto nao encontrado")
+                                    break
+                                }
+
+                                println("Item escolhido: ${produtoEscolhido.nome}")
+                                println("Deseja adicionar quantos? (estoque disponível: ${produtoEscolhido.estoque})")
+                                quantidade = readln().toInt()
+
+                                if(produtoEscolhido.estoque < quantidade || quantidade == 0) {
+                                    println("Número no estoque indisponível")
+                                    break
+                                } else {
+                                    itensEscolhidos.add(produtoEscolhido)
+                                    produtoEscolhido.estoque = produtoEscolhido.estoque - quantidade
+
+                                    novoPedido.valor += (produtoEscolhido.preco * quantidade)
+
+                                    println("${produtoEscolhido.nome} adicionado com sucesso\n")
+                                }
+
+                                escolhendoItens = false
+                            } while (escolhendoItens)
+                        }
+                        2 -> {
+                            var total: Float = 0f
+                            if(novoPedido.itens.isEmpty()) {
+                                println("Você deve escolher no minímo um item para finalizar o pedido")
+
+                            } else {
+                                println("Total do seu pedido: ${novoPedido.valor}")
+                                println("Deseja adicionar cupom? Se sim, digite cupom, se não aperte Enter")
+                                val cupom: String = readln()
+
+                                val porcentagemDesconto: Float = 0.1f
+
+                                if (cupom != "") {
+                                    total = novoPedido.valor * (1 - porcentagemDesconto)
+                                } else {
+                                    total = novoPedido.valor
+                                }
+
+                                pedidos.add(novoPedido)
+
+                                println("Pedido efetuado com sucesso. O total da sua conta é $total\n\n")
+
+                                pedidos[numeroPedido].pagamento = "Pago"
+                                fazendoPedido = false
+                            }
+                        }
+                        3 -> {
+                            if (itensEscolhidos.isEmpty()) {
+                                println("O carrinho está vazio")
+                            } else {
+                                itensEscolhidos.forEach {
+                                    itensMenu[it.codigo - 1].estoque += quantidade
+                                }
+                                novoPedido.valor = 0f
+                                itensEscolhidos.clear()
+                                println("Carrinho limpo com sucesso!\n")
+                            }
+                        }
+                        4 -> {
+                            if (itensEscolhidos.isEmpty()) {
+                                fazendoPedido = false
+                            } else {
+                                println("Você deve finalizar o seu pedido ou limpar o seu carrinho!!!")
+                            }
+                        }
+                    }
+                } while (fazendoPedido)
+            }
             6 -> isOnInterface = false
             else -> println("Opção inválida")
+
         }
+
     } while (isOnInterface)
 }
+
