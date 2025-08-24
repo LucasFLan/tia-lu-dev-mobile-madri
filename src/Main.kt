@@ -23,13 +23,12 @@ data class Pedido (
     var valor: Float
 )
 
-
 fun main() {
 
-
-    var isOnInterface: Boolean = true
     var itensMenu = mutableListOf<Produto>()
     var pedidos = mutableListOf<Pedido>()
+
+    var isOnInterface: Boolean = true
 
     do {
         println("1 - Cadastrar item")
@@ -41,7 +40,7 @@ fun main() {
 
         val opcaoEscolhida: Int = readln().toInt()
 
-        when (opcaoEscolhida) {
+        when(opcaoEscolhida) {
             1 -> {
                 try {
                     println("---CADASTRO DE ITEM---")
@@ -57,13 +56,11 @@ fun main() {
                     println("Quantidade em estoque")
                     val estoqueItem: Int = readln().toInt()
 
-                    val novoProduto = Produto(
-                        nome = nomeItem, descricao = descricaoItem, preco = precoItem, estoque = estoqueItem,
-                        codigo = itensMenu.size + 1
-                    )
+                    val novoProduto = Produto(nome = nomeItem, descricao = descricaoItem, preco = precoItem, estoque = estoqueItem,
+                        codigo = itensMenu.size + 1)
 
                     itensMenu.add(novoProduto)
-                } catch (e: NumberFormatException) {
+                } catch (e: NumberFormatException){
                     println("Entrada inválida, digite um número para preço e estoque")
                 }
             }
@@ -198,10 +195,16 @@ fun main() {
 
                                 val porcentagemDesconto: Float = 0.1f
 
-                                if (cupom != "") {
-                                    total = novoPedido.valor * (1 - porcentagemDesconto)
-                                } else {
-                                    total = novoPedido.valor
+                                when {
+                                    cupom == "DEZ" -> total = novoPedido.valor * (1 - porcentagemDesconto)
+                                    cupom == "" -> {
+                                        println("Pagamento sem cupom")
+                                        total = novoPedido.valor
+                                    }
+                                    else -> {
+                                        println("Cupom inválido")
+                                        total = novoPedido.valor
+                                    }
                                 }
 
                                 pedidos.add(novoPedido)
@@ -282,11 +285,65 @@ fun main() {
                 }
 
             }
+            5 -> {
+                println("---CONSULTA DE PEDIDOS---")
+
+                var estaConsultando = true
+
+                do {
+
+                    if(pedidos.isEmpty()) {
+                        println("Sem pedidos por enquanto!\n")
+                        break
+                    }
+
+                    println("Vizualizar pedidos:")
+                    println("1 - VER TODOS")
+                    println("2 - ACEITO")
+                    println("3 - FAZENDO")
+                    println("4 - FEITO")
+                    println("5 - ESPERANDO ENTREGADOR")
+                    println("6 - SAIU PARA ENTREGA")
+                    println("7 - ENTREGUE")
+                    println("8 - Sair da consulta")
+
+                    val opcaoEscolhida: Int = readln().toInt()
+                    var pedidosPorStatus: List<Pedido> = listOf()
+
+                    when (opcaoEscolhida) {
+                        1 -> {
+                            for (pedido in pedidos) {
+                                println("Pedido ${pedido.numeroPedido} - Itens: ${pedido.itens} - VALOR: R$${pedido.valor} - ${pedido.pagamento} - ${pedido.status}")
+                            }
+                        }
+                        2 -> pedidosPorStatus = pedidos.filter { it.status == OrderStatus.ACEITO }
+                        3 -> pedidosPorStatus = pedidos.filter { it.status == OrderStatus.FAZENDO }
+                        4 -> pedidosPorStatus = pedidos.filter { it.status == OrderStatus.FEITO }
+                        5 -> pedidosPorStatus = pedidos.filter { it.status == OrderStatus.ESPERANDO_ENTREGADOR }
+                        6 -> pedidosPorStatus = pedidos.filter { it.status == OrderStatus.SAIU_PARA_ENTREGA }
+                        7 -> pedidosPorStatus = pedidos.filter { it.status == OrderStatus.ENTREGUE }
+                        8 -> {
+                            println("Saindo...")
+                            break
+                        }
+                        else -> {
+                            println("Opção inválida!")
+                            break
+                        }
+                    }
+
+                    if (pedidosPorStatus.isEmpty() && opcaoEscolhida != 1) {
+                        println("Nenhum pedido encontrado com esse status")
+                    } else {
+                        for (pedido in pedidosPorStatus) {
+                            println("Pedido ${pedido.numeroPedido} - Itens: ${pedido.itens} - VALOR: R$${pedido.valor} - ${pedido.pagamento} - ${pedido.status}")
+                        }
+                    }
+
+                } while (estaConsultando)
+            }
             6 -> isOnInterface = false
             else -> println("Opção inválida")
-
         }
-
     } while (isOnInterface)
 }
-
